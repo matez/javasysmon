@@ -6,6 +6,7 @@ import junit.framework.TestCase;
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.Map;
 
 public class UnixPasswdParserTest extends TestCase {
 
@@ -13,7 +14,7 @@ public class UnixPasswdParserTest extends TestCase {
         String emptyLine = "+::::::\n";
         BufferedReader reader = new BufferedReader(new StringReader(emptyLine));
         UnixPasswdParser unixPasswdParser = new UnixPasswdParser();
-        final HashMap passwd = unixPasswdParser.parse(reader);
+        final Map<String, String> passwd = unixPasswdParser.parse(reader);
         Assert.assertEquals(0, passwd.size());
     }
 

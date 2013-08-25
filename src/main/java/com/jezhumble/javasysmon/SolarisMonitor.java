@@ -2,6 +2,7 @@ package com.jezhumble.javasysmon;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 class SolarisMonitor implements Monitor {
     private static Monitor monitor = null;
@@ -29,8 +30,9 @@ class SolarisMonitor implements Monitor {
     }
 
     public ProcessInfo[] processTable() {
-        ArrayList processTable = new ArrayList();
+        List<ProcessInfo> processTable = new ArrayList<ProcessInfo>();
         final String[] pids = fileUtils.pidsFromProcFilesystem();
+
         for (int i = 0; i < pids.length; i++) {
             try {
                 byte[] psinfo = fileUtils.slurpToByteArray("/proc/" + pids[i] + "/psinfo");

@@ -2,6 +2,7 @@ package com.jezhumble.javasysmon;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class provides the main API for JavaSysMon.
@@ -30,7 +31,7 @@ import java.util.Iterator;
 public class JavaSysMon implements Monitor {
 
     private static Monitor monitor = null;
-    private static ArrayList supported = new ArrayList();
+    private static List<String> supported = new ArrayList<String>();
 
     /**
      * Allows you to register your own implementation of {@link Monitor}.
@@ -73,8 +74,11 @@ public class JavaSysMon implements Monitor {
         if (monitor instanceof NullMonitor) {
             System.err.println("Couldn't find an implementation for OS: " + System.getProperty("os.name"));
             System.err.println("Supported configurations:");
-            for (Iterator iter = supported.iterator(); iter.hasNext(); ) {
-                String config = (String) iter.next();
+
+            String config;
+
+            for (Iterator<String> iter = supported.iterator(); iter.hasNext(); ) {
+                config = iter.next();
                 System.err.println(config);
             }
         } else {
@@ -82,6 +86,7 @@ public class JavaSysMon implements Monitor {
                 System.out.println("Attempting to kill process id " + params[0]);
                 monitor.killProcess(Integer.parseInt(params[0]));
             }
+
             CpuTimes initialTimes = monitor.cpuTimes();
             System.out.println("OS name: " + monitor.osName() +
                     "  Uptime: " + secsInDaysAndHours(monitor.uptimeInSeconds()) +
@@ -94,6 +99,7 @@ public class JavaSysMon implements Monitor {
             System.out.println("CPU Usage: " + monitor.cpuTimes().getCpuUsage(initialTimes));
             System.out.println("\n" + ProcessInfo.header());
             ProcessInfo[] processes = monitor.processTable();
+
             for (int i = 0; i < processes.length; i++) {
                 System.out.println(processes[i].toString());
             }

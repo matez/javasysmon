@@ -1,9 +1,6 @@
 package com.jezhumble.javasysmon;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * This object represents a node in the process tree. It knows
@@ -12,7 +9,7 @@ import java.util.List;
  */
 public class OsProcess {
 
-    private final ArrayList children = new ArrayList();
+    private final List<OsProcess> children = new ArrayList<OsProcess>();
     private final ProcessInfo processInfo;
 
     private OsProcess(ProcessInfo processInfo) {
@@ -28,20 +25,27 @@ public class OsProcess {
      * @return A graph of OsProcess objects.
      */
     public static OsProcess createTree(ProcessInfo[] processTable) {
-        HashMap processes = new HashMap();
+        int pid, ppid;
+        OsProcess process;
+
+        Map<Integer, OsProcess> processes = new HashMap<Integer, OsProcess>();
         OsProcess topLevelProcess = new OsProcess(null);
+
         for (int i = 0; i < processTable.length; i++) {
-            OsProcess process = new OsProcess(processTable[i]);
-            processes.put(new Integer(processTable[i].getPid()), process);
+            process = new OsProcess(processTable[i]);
+            processes.put(processTable[i].getPid(), process);
         }
+
         for (int i = 0; i < processTable.length; i++) {
-            int pid = processTable[i].getPid();
-            int ppid = processTable[i].getParentPid();
-            OsProcess process = (OsProcess) processes.get(new Integer(pid));
-            if (ppid == pid || !processes.containsKey(new Integer(ppid))) {
+            pid = processTable[i].getPid();
+            ppid = processTable[i].getParentPid();
+
+            process = processes.get(pid);
+
+            if (ppid == pid || !processes.containsKey(ppid)) {
                 topLevelProcess.children.add(process);
             } else {
-                ((OsProcess) processes.get(new Integer(ppid))).children.add(process);
+                processes.get(ppid).children.add(process);
             }
         }
         return topLevelProcess;
@@ -76,12 +80,17 @@ public class OsProcess {
         if (this.processInfo != null && this.processInfo.getPid() == pid) {
             return this;
         }
-        for (Iterator it = children.iterator(); it.hasNext();) {
-            final OsProcess found = ((OsProcess) it.next()).find(pid);
+
+        OsProcess found;
+
+        for (Iterator<OsProcess> it = children.iterator(); it.hasNext();) {
+            found = it.next().find(pid);
+
             if (found != null) {
                 return found;
             }
         }
+
         return null;
     }
 
@@ -93,9 +102,10 @@ public class OsProcess {
      * @param level          The level currently being visited
      */
     public void accept(ProcessVisitor processVisitor, int level) {
-        for (Iterator it = children.iterator(); it.hasNext();) {
-            ((OsProcess) it.next()).accept(processVisitor, level + 1);
+        for (Iterator<OsProcess> it = children.iterator(); it.hasNext();) {
+            it.next().accept(processVisitor, level + 1);
         }
+
         if (this.processInfo != null) {
             if (processVisitor.visit(this, level)) {
                 new JavaSysMon().killProcess(processInfo.getPid());

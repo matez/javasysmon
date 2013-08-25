@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -115,8 +116,9 @@ class LinuxMonitor implements Monitor {
     }
 
     public ProcessInfo[] processTable() {
-        ArrayList processTable = new ArrayList();
+        List<ProcessInfo> processTable = new ArrayList<ProcessInfo>();
         final String[] pids = fileUtils.pidsFromProcFilesystem();
+
         for (int i = 0; i < pids.length; i++) {
             try {
                 String stat = fileUtils.slurp("/proc/" + pids[i] + "/stat");
@@ -132,7 +134,8 @@ class LinuxMonitor implements Monitor {
                 // process probably died since we got the process list
             }
         }
-        return (ProcessInfo[]) processTable.toArray(new ProcessInfo[processTable.size()]);
+
+        return processTable.toArray(new ProcessInfo[processTable.size()]);
     }
 
     public CpuTimes cpuTimes() {

@@ -1,6 +1,6 @@
 package com.jezhumble.javasysmon;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -8,7 +8,7 @@ class LinuxProcessInfoParser {
     private final String stat;
     private final String status;
     private final String cmdline;
-    private final HashMap uids;
+    private final Map<String, String> uids;
     private final int userHz;
 
     private static final Pattern STATUS_NAME_MATCHER =
@@ -20,7 +20,7 @@ class LinuxProcessInfoParser {
     private static final Pattern STATUS_VM_RSS_MATCHER =
             Pattern.compile("VmRSS:\\s+(\\d+) kB", Pattern.MULTILINE);
 
-    public LinuxProcessInfoParser(String stat, String status, String cmdline, HashMap uids, int userHz) {
+    public LinuxProcessInfoParser(String stat, String status, String cmdline, Map<String, String> uids, int userHz) {
         this.stat = stat;
         this.status = status;
         this.cmdline = cmdline;
@@ -47,6 +47,7 @@ class LinuxProcessInfoParser {
         int parentPid;
         long userMillis;
         long systemMillis;
+
         try
         {
             pid = Integer.parseInt(pidStr);
@@ -61,6 +62,7 @@ class LinuxProcessInfoParser {
 
         long residentBytes;
         long totalBytes;
+
         try
         {
             residentBytes = Long.parseLong(getFirstMatch(STATUS_VM_RSS_MATCHER, status)) * 1024;
@@ -75,7 +77,7 @@ class LinuxProcessInfoParser {
                 parentPid,
                 trim(cmdline),
                 getFirstMatch(STATUS_NAME_MATCHER, status),
-                (String) uids.get(getFirstMatch(STATUS_UID_MATCHER, status)),
+                uids.get(getFirstMatch(STATUS_UID_MATCHER, status)),
                 userMillis,
                 systemMillis,
                 residentBytes,
