@@ -40,7 +40,7 @@ Current support and limitations
 * Currently supports Mac OS X, Linux, Windows, and Solaris
 * Solaris binary is compiled on x86 on OpenSolaris, so it won't work on SPARC, and has not been tested on SunOS < 5.11
 * Solaris CPU usage only correctly reports usage for first CPU.
-* Supports Java 1.4 and above
+* Supports Java 1.6 and above
 * CPU speed on Linux only reports correct values for Intel CPUs
 
 Source code
